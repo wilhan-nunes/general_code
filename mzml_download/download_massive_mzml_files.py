@@ -8,15 +8,15 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 
 
 def download_mzml(df: pd.DataFrame, save_to:str):
-    directory_path = os.path.join(save_to, tsv.split('.')[0])
-    if not os.path.exists(directory_path):
+
+    if not os.path.exists(save_to):
         # If it doesn't exist, create it
-        os.makedirs(directory_path)
-    error_log = os.path.join(directory_path, 'error_log.txt')
+        os.makedirs(save_to)
+    error_log = os.path.join(save_to, 'error_log.txt')
     # Define the base URL
     url = "https://massive.ucsd.edu/ProteoSAFe/DownloadResultFile"
     # Downloaded files:
-    downloaded_files = set(os.listdir(directory_path))
+    downloaded_files = set(os.listdir(save_to))
     counter = 0
     for i, row in df.iterrows():
         usi = row['USI']
