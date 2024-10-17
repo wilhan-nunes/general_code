@@ -114,7 +114,8 @@ def main():
     directory = './_files/input_tsv'
     tsv_list = [file for file in os.listdir(directory) if file.endswith('.tsv')]
     mzml_save_dir = './_files/mzml_files'
-    
+    rt_tolerance = 0.3  # (in minutes) change if needed
+
     for file_name in tsv_list:
         df = pd.read_csv(os.path.join(directory, file_name), sep='\t')
 
@@ -125,7 +126,7 @@ def main():
         # Step 2: Extract ion chromatograms and calculate areas
         print(f"Extracting ion chromatograms and calculating areas for {file_name}...")
         results_file = f'{file_name[:-4]}_xic_results.tsv'
-        extract_ion_chromatograms(df, mzml_save_dir, results_file, rt_tolerance=0.3)
+        extract_ion_chromatograms(df, mzml_save_dir, results_file, rt_tolerance=rt_tolerance)
 
 if __name__ == '__main__':
     main()
