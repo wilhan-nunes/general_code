@@ -114,8 +114,8 @@ def main():
     directory = './_files/input_tsv'
     tsv_list = [file for file in os.listdir(directory) if file.endswith('.tsv')]
     mzml_save_dir = './_files/mzml_files'
-    rt_tolerance = 0.3  # (in minutes) change if needed
-
+    rt_tolerance = 0.3  # (in minutes) change this if needed
+    
     for file_name in tsv_list:
         df = pd.read_csv(os.path.join(directory, file_name), sep='\t')
 
