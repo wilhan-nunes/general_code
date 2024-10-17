@@ -47,8 +47,9 @@ def download_mzml(df: pd.DataFrame, save_to: str):
 
             pbar.update(1)  # Update progress bar for each file downloaded
 
+
 # Function to extract ion chromatograms and calculate areas with a progress bar
-def extract_ion_chromatograms(df: pd.DataFrame, mzml_dir: str, result_filename: str):
+def extract_ion_chromatograms(df: pd.DataFrame, mzml_dir: str, result_filename: str, rt_tolerance=0.3):
     with tqdm(total=len(df), desc="Extracting ion chromatograms", unit="file") as pbar:
         for i, row in df.iterrows():
             mzml_file = row['Filename']
@@ -84,11 +85,20 @@ def extract_ion_chromatograms(df: pd.DataFrame, mzml_dir: str, result_filename: 
                 peak_retention_time = peak[0]
                 peak_intensity = peak[1]
 
+                # rt_tolerance in min
+                rt_min = peak_retention_time - rt_tolerance
+                rt_max = peak_retention_time + rt_tolerance
+                peak_range = [(rt, intensity) for rt, intensity in xic_data if rt_min <= rt <= rt_max]
+                x_values, y_values = zip(*peak_range)
+                peak_area = np.trapezoid(y_values, x_values)
+
                 df.at[i, 'area_under_curve'] = auc
+                df.at[i, 'peak_area'] = peak_area
                 df.at[i, 'peak_rt'] = peak_retention_time
                 df.at[i, 'peak_intensity'] = peak_intensity
             else:
                 df.at[i, 'area_under_curve'] = np.nan
+                df.at[i, 'peak_area'] = np.nan
                 df.at[i, 'peak_rt'] = np.nan
                 df.at[i, 'peak_intensity'] = np.nan
 
@@ -110,12 +120,12 @@ def main():
 
         # Step 1: Download mzML files to a single folder
         print(f"Downloading mzML files for {file_name}...")
-        download_mzml(df, mzml_save_dir,)
+        download_mzml(df, mzml_save_dir)
 
         # Step 2: Extract ion chromatograms and calculate areas
         print(f"Extracting ion chromatograms and calculating areas for {file_name}...")
         results_file = f'{file_name[:-4]}_xic_results.tsv'
-        extract_ion_chromatograms(df, mzml_save_dir, results_file)
+        extract_ion_chromatograms(df, mzml_save_dir, results_file, rt_tolerance=0.3)
 
 if __name__ == '__main__':
     main()
