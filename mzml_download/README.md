@@ -67,5 +67,5 @@ For each input TSV file, the script will generate a corresponding results file i
    - Download the `.mzML` files from UCSD MASSIVE.
    - Process the files and calculate the areas under the XIC curves.
    - Save the results in the **`area_results/`** folder as TSV files.
-   - Obs: you can change the rt_tolerance in the **`main()`** function if needed. This is used to calculate the area under the peak
+   - Obs: you can change the rt_tolerance in the **`main()`** function if needed. This is used to calculate the area under the peak.
 

@@ -9,6 +9,7 @@ from tqdm import tqdm
 # Suppress warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
+
 # Function to download mzML files
 def download_mzml(df: pd.DataFrame, save_to: str):
     if not os.path.exists(save_to):
@@ -74,7 +75,7 @@ def extract_ion_chromatograms(df: pd.DataFrame, mzml_dir: str, result_filename: 
                     rt = spectrum.scan_time_in_minutes()
                     intensities = spectrum.i[
                         (spectrum.mz >= mz_min) & (spectrum.mz <= mz_max)
-                    ]
+                        ]
                     total_intensity = sum(intensities)
                     xic_data.append((rt, total_intensity))
 
@@ -109,13 +110,14 @@ def extract_ion_chromatograms(df: pd.DataFrame, mzml_dir: str, result_filename: 
         os.makedirs(result_dir)
     df.to_csv(os.path.join(result_dir, result_filename), sep='\t', index=False)
 
+
 # Main flow
 def main():
     directory = './_files/input_tsv'
     tsv_list = [file for file in os.listdir(directory) if file.endswith('.tsv')]
     mzml_save_dir = './_files/mzml_files'
     rt_tolerance = 0.3  # (in minutes) change this if needed
-    
+
     for file_name in tsv_list:
         df = pd.read_csv(os.path.join(directory, file_name), sep='\t')
 
@@ -127,6 +129,7 @@ def main():
         print(f"Extracting ion chromatograms and calculating areas for {file_name}...")
         results_file = f'{file_name[:-4]}_xic_results.tsv'
         extract_ion_chromatograms(df, mzml_save_dir, results_file, rt_tolerance=rt_tolerance)
+
 
 if __name__ == '__main__':
     main()
