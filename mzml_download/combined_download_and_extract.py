@@ -114,7 +114,7 @@ def main():
 
         # Step 2: Extract ion chromatograms and calculate areas
         print(f"Extracting ion chromatograms and calculating areas for {file_name}...")
-        results_file = f'{file_name[:-4]}+_xic_results.tsv'
+        results_file = f'{file_name[:-4]}_xic_results.tsv'
         extract_ion_chromatograms(df, mzml_save_dir, results_file)
 
 if __name__ == '__main__':

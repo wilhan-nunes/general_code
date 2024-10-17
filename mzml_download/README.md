@@ -20,15 +20,13 @@ root_directory/
 │   │   ├── your_input_file_1.tsv
 │   │   └── your_input_file_2.tsv   # Multiple input .tsv files can be processed
 │   │
-│   ├── mzml_files/                 # Folder where downloaded .mzML files are stored
-│   │   ├── folder_for_tsv_1/
-│   │   │   └── downloaded_mzml_file_1.mzML
-│   │   └── folder_for_tsv_2/
-│   │       └── downloaded_mzml_file_2.mzML
+│   ├── mzml_files/                 # Centralized folder where downloaded .mzML files are stored
+│   │   ├── file1.mzML
+│   │   └── file2.mzML              # All mzML files downloaded to a single folder
 │   │
 │   └── mzml_files/area_results/    # Folder for saving output files with XIC area calculations
-│       ├── xic_results_1.tsv
-│       └── xic_results_2.tsv
+│       ├── your_input_file_1_xic_results_1.tsv
+│       └── your_input_file_2_xic_results_2.tsv
 ```
 
 - **`_files/input_tsv/`**: Input TSV files should be placed here.
