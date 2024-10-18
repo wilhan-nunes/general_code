@@ -73,7 +73,7 @@ pip install -r requirements.txt
 ### Running
 
 1. Place your input TSV file(s) in the **`_files/input_tsv/`** folder.
-2. Run the script. It will:
+2. Run the script [combined_download_and_extract.py](combined_download_and_extract.py). It will:
    - Download the `.mzML` files from UCSD MASSIVE.
    - Process the files and calculate the areas under the XIC curves.
    - Save the results in the **`area_results/`** folder as TSV files.
