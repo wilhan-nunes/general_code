@@ -40,7 +40,7 @@ def retrieve_prec_mz(csv_path: str, save_to: str):
 
 
 def main():
-    csv_path = './Julius_USI.csv'
+    csv_path = '../mzml_download/Julius_USI.csv'
     save_to = './Julius_USI_precmz.tsv'
     retrieve_prec_mz(csv_path, save_to)
 
