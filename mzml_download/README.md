@@ -62,6 +62,16 @@ For each input TSV file, the script will generate a corresponding results file i
 
 ## **How to Run the Script**
 
+### Installation
+
+Before running the script, ensure that you have installed the necessary dependencies. You can do this by running:
+
+```bash
+pip install -r requirements.txt
+```
+
+### Running
+
 1. Place your input TSV file(s) in the **`_files/input_tsv/`** folder.
 2. Run the script. It will:
    - Download the `.mzML` files from UCSD MASSIVE.
