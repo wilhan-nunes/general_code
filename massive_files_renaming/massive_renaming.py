@@ -20,6 +20,12 @@ file_list = massive_files(msvnumber)
 
 
 def extract_prefix(text):
+    """
+    Function to extract the prefix of the file name (the first two fields separated by underscore) that represents
+    the plate number and coordinates. Ex: P1_G9 = Plate 1 row G column 9
+    :param text:
+    :return:
+    """
     match = re.search(r'^([^_]+)_([^_]+)', text)
     if match:
         return f"{match.group(1)}_{match.group(2)}"
@@ -50,7 +56,7 @@ for file in plate_maps:
 df = pd.DataFrame()
 df['correct_name'] = complete_list
 #  correcting misspelling
-# df['correct_name'] = df['correct_name'].apply(lambda x: x.replace('BSPS', 'BPSP'))
+df['correct_name'] = df['correct_name'].apply(lambda x: x.replace('BSPS', 'BPSP'))
 df['prefix'] = df['correct_name'].apply(lambda x: extract_prefix(x.split('/')[-1]))
 
 incorrect_df = pd.DataFrame()
@@ -71,3 +77,23 @@ renaming_df = merged_df[['incorrect_name', 'full_correct_name']][merged_df['inco
 # removing the files that doesn't have a correspondence to the platemap
 renaming_df = renaming_df.dropna(subset=['full_correct_name'])
 renaming_df['full_correct_name'] = renaming_df['full_correct_name'].apply(lambda x: x.replace('BSPS', 'BPSP'))
+renaming_df['full_correct_name'] = renaming_df['full_correct_name'].apply(lambda x: x.replace('raw/BPSP', 'raw/BSPS'))
+
+
+
+# Function to rename files based on the DataFrame
+def rename_files(dataframe):
+    for index, row in dataframe.iterrows():
+        incorrect_name = row['incorrect_name']
+        full_correct_name = row['full_correct_name']
+
+        try:
+            # Rename the file
+            os.rename(incorrect_name, full_correct_name)
+            print(f"Renamed: {incorrect_name} -> {full_correct_name}")
+        except FileNotFoundError:
+            print(f"File not found: {incorrect_name}")
+        except Exception as e:
+            print(f"Error renaming {incorrect_name} to {full_correct_name}: {e}")
+
+# rename_files(renaming_df)
