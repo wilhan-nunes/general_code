@@ -82,18 +82,23 @@ renaming_df['full_correct_name'] = renaming_df['full_correct_name'].apply(lambda
 
 
 # Function to rename files based on the DataFrame
-def rename_files(dataframe):
+def rename_files(dataframe, root:str):
     for index, row in dataframe.iterrows():
-        incorrect_name = row['incorrect_name']
-        full_correct_name = row['full_correct_name']
+        root_norm = os.path.normpath(root)
+        incorrect_name = os.path.normpath(row['incorrect_name'])
+        full_correct_name = os.path.normpath(row['full_correct_name'])
+        old_path = os.path.join(root_norm, incorrect_name)
+        new_path = os.path.join(root_norm, full_correct_name)
 
         try:
             # Rename the file
-            os.rename(incorrect_name, full_correct_name)
-            print(f"Renamed: {incorrect_name} -> {full_correct_name}")
+            os.rename(old_path, new_path)
+            print(f"Renamed: {old_path} -> {new_path}")
         except FileNotFoundError:
-            print(f"File not found: {incorrect_name}")
+            print(f"File not found: {old_path}")
         except Exception as e:
-            print(f"Error renaming {incorrect_name} to {full_correct_name}: {e}")
+            print(f"Error renaming {old_path} to {new_path}: {e}")
 
-# rename_files(renaming_df)
+
+root_folder = './path/to/massive/folder'
+rename_files(renaming_df, root_folder)
