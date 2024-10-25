@@ -63,8 +63,8 @@ def calculate_conc(ratios_tsv: str, equations_tsv: str, output: str, both_roots=
 
 def main():
     # Defining parameters
-    equations_tsv = './equations_template.tsv'
-    ratios_tsv = './ratio_template.tsv'
+    equations_tsv = './input/equations_template.tsv'
+    ratios_tsv = './input/ratio_template.tsv'
     output = 'quantification_results.tsv'
 
     # Calling function
