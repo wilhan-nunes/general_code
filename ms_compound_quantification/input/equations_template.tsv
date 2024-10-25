@@ -1,0 +1,14 @@
+Compound	Equation
+Histamine-C2:0	y = -1.2177x2 + 13.342x + 0.8066
+Histamine-C3:0	y = -2.9762x2 + 18.754x + 0.0689
+Histamine-C4:0	y = -3.3526x2 + 19.686x - 0.1219
+Histamine-C5:0	y = -2.2359x2 + 13.484x - 0.0976
+Histamine-C6:0	y = -2.058x2 + 24.035x - 0.0869
+Cadaverine-C2:0	y = -0.1045x2 + 4.3662x + 2.1771
+Cadaverine-C3:0	y = -0.3578x2 + 8.574x + 0.9113
+Cadaverine-C5:0	y = -0.8816x2 + 8.6703x + 0.0447
+Cadaverine-C6:0	y = 4.8166x2 + 10.007x - 0.017
+Cadaverine-C7:0	y = 5.5112x2 + 8.5631x - 0.0237
+Dopamine-C2:0	y = -0.2222x2 + 1.3862x - 0.003
+Serotonin-C2:0	y = -10.566x2 + 6.971x - 0.002
+Tryptophan-C3:0	y = 0.1138x2 + 1.0159x - 0.0002
