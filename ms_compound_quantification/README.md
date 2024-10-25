@@ -8,8 +8,8 @@ This Python script calculates the concentration of compounds in samples by apply
 ### `calculate_conc`
 
 This function calculates compound concentrations by:
-1. Reading in the sample peak area ratios (`ratio_template.tsv`).
-2. Parsing compound-specific quadratic equations (`equations_template.tsv`).
+1. Reading in the sample peak area ratios ([ratio_template.tsv](./input/ratio_template.tsv)).
+2. Parsing compound-specific quadratic equations ([equations_template.tsv](./input/equations_template.tsv)).
 3. Solving each equation for each compound/sample ratio using quadratic root calculations.
 4. Saving the calculated roots (concentrations) for each compound and sample.
 
