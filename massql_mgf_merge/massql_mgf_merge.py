@@ -7,13 +7,14 @@ import requests
 from tqdm import tqdm
 
 
-def download_task_zip(task_id):
+def download_task_zip(task_id, output_dir="./downloaded_content"):
     """
     Download the task zip file from a task id.
     """
     from tqdm import tqdm
 
-    file_path = f"./downloaded_content/{task_id}.tar"
+    os.makedirs(output_dir, exist_ok=True)
+    file_path = os.path.join(output_dir, f"{task_id}.tar")
     if os.path.exists(file_path):
         print(f"File {file_path} already exists. Skipping download.")
         return
@@ -22,7 +23,6 @@ def download_task_zip(task_id):
     response = requests.get(url, stream=True)
     if response.status_code == 200:
         total_size = int(response.headers.get("content-length", 0))
-        os.makedirs("downloaded_content", exist_ok=True)
         print(f"Starting download for task {task_id}...")
         with open(file_path, "wb") as f, tqdm(
             desc=f"Downloading {task_id}.tar",
@@ -62,13 +62,14 @@ def extract_results(tar_file, subfolder):
         )
 
 
-def download_tsv_summary(task):
+def download_tsv_summary(task, output_dir="./downloaded_content"):
     print(f"Downloading TSV summary for task {task}...")
+    os.makedirs(output_dir, exist_ok=True)
     url = f"https://gnps2.org/resultfile?task={task}&file={quote('nf_output/extracted/extracted.tsv')}"
     response = requests.get(url)
     response.raise_for_status()
     if response.status_code == 200:
-        file_path = f"./downloaded_content/extracted_{task}.tsv"
+        file_path = os.path.join(output_dir, f"extracted_{task}.tsv")
         open(file_path, "wb").write(response.content)
         print(f"Task {task} TSV summary downloaded successfully.")
         return file_path
@@ -77,16 +78,14 @@ def download_tsv_summary(task):
         return None
 
 
-def insert_mgf_info(task: str, name: str, tsv_file_path: str):
+def insert_mgf_info(task: str, name: str, tsv_file_path: str, base_folder: str = "./downloaded_content"):
     print(f"Inserting MGF info for task {task}...")
     df = pd.read_csv(tsv_file_path, sep="\t")
     files_to_process = df["new_filename"].unique()
     for file in tqdm(files_to_process, desc="Processing MGF files"):
         subset = df[df["new_filename"] == file]
-        mgf_file_path = f"./downloaded_content/{task}/nf_output/extracted/extracted_mgf/{file.split('.')[0]}.mgf"
-        output_mgf_file_path = (
-            f"./downloaded_content/{task}/processed_{file.split('.')[0]}.mgf"
-        )
+        mgf_file_path = os.path.join(base_folder, task, "nf_output", "extracted", "extracted_mgf", f"{file.split('.')[0]}.mgf")
+        output_mgf_file_path = os.path.join(base_folder, task, f"processed_{file.split('.')[0]}.mgf")
 
         with open(mgf_file_path, "r") as f, open(output_mgf_file_path, "w") as out_f:
             for line in f:
