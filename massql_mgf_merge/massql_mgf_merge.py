@@ -10,6 +10,9 @@ from tqdm import tqdm
 def download_task_zip(task_id, output_dir="./downloaded_content"):
     """
     Download the task zip file from a task id.
+    :param task_id: Task ID for the GNPS2 job.
+    :param output_dir: Directory to save the downloaded file.
+    :return: None
     """
     from tqdm import tqdm
 
@@ -42,6 +45,8 @@ def download_task_zip(task_id, output_dir="./downloaded_content"):
 def extract_results(tar_file, subfolder):
     """
     Extract the contents of a specific subfolder from a tar file.
+    :param tar_file: Path to the tar file.
+    :param subfolder: Subfolder to extract from the tar file.
     """
     import tarfile
     import os
@@ -63,6 +68,12 @@ def extract_results(tar_file, subfolder):
 
 
 def download_tsv_summary(task, output_dir="./downloaded_content"):
+    """
+    Download the TSV summary file generated for a given MassQL task.
+    :param task: GNPS2 MassQL job task ID.
+    :param output_dir: Directory to save the downloaded TSV file.
+    :return:
+    """
     print(f"Downloading TSV summary for task {task}...")
     os.makedirs(output_dir, exist_ok=True)
     url = f"https://gnps2.org/resultfile?task={task}&file={quote('nf_output/extracted/extracted.tsv')}"
@@ -79,6 +90,14 @@ def download_tsv_summary(task, output_dir="./downloaded_content"):
 
 
 def insert_mgf_info(task: str, name: str, tsv_file_path: str, base_folder: str = "./downloaded_content"):
+    """
+    Insert MGF info into the MGF files based on the TSV summary.
+    :param task: task ID for the GNPS2 job. This will be used to construct the MGF file path associated with the task.
+    :param name:
+    :param tsv_file_path: TSV file generated during the MASSQL job. This file contains the information needed to insert the metadata into the MGF files.
+    :param base_folder: Folder under which the MGF files are stored. This is usually the same folder where the task zip file was downloaded and extracted.
+    :return: None
+    """
     print(f"Inserting MGF info for task {task}...")
     df = pd.read_csv(tsv_file_path, sep="\t")
     files_to_process = df["new_filename"].unique()
@@ -110,6 +129,9 @@ def insert_mgf_info(task: str, name: str, tsv_file_path: str, base_folder: str =
 def concatenate_mgf_files(input_folder, output_file):
     """
     Concatenate all .mgf files in subfolders of the input folder into a single .mgf file.
+    :param input_folder: The folder containing the .mgf files to concatenate.
+    :param output_file: The output file path for the concatenated .mgf file.
+    :return: None
     """
     print(f"Concatenating .mgf files from {input_folder} into {output_file}...")
     with open(output_file, "w") as outfile:
@@ -126,6 +148,9 @@ def concatenate_mgf_files(input_folder, output_file):
 def renumber_mgf_file(input_mgf, output_mgf):
     """
     Renumber the SCANS in the input MGF file and save to output MGF file.
+    :param input_mgf: Path to the input MGF file.
+    :param output_mgf: Path to the output renumbered MGF file.
+    :return: None
     """
     print(f"Renumbering SCANS in {input_mgf} and saving to {output_mgf}...")
     with open(input_mgf, "r") as infile, open(output_mgf, "w") as outfile:
@@ -140,18 +165,20 @@ def renumber_mgf_file(input_mgf, output_mgf):
 
 if __name__ == "__main__":
     print("Starting GNPS2 task processing...")
-    # Carnitines massql jobs:
-    base_url = "https://gnps2.org/status?task="
+
+    # Example task IDs and names, change this to yor names and task IDs
     tasks = {
-        "metabolights": "2e50af7f1cfc42c391a5fe2eb7b06de7",
-        "workbench": "9980bbf19ae54657a2d3d881475745fe",
-        "massive_orbitrap": "1a998a6fa2c2475695f0111039c09515",
-        "massive_qtof": "acfd0ffaad674600a7c4d1f40e27c082",
-        "massive_qe": "66d35bffcb8e4299b89652830b97a0b4",
+        "name_1": "2e50af7f1cfc42r391a5fe2eb7b06de7",
+        "name_2": "9980bbf19ae54657b2d3d881475745fe",
+        "name_3": "1a998a6fa2c2475195f0111039c09515",
     }
+
+    # Folder to store downloaded content
+    output_dir = "./downloaded_content"
+
     for name, task in tasks.items():
         print(f"Downloading task files: {name} ({task})")
-        download_task_zip(task)
+        download_task_zip(task, output_dir=output_dir)
 
     for name, task in tqdm(tasks.items(), desc="Processing tasks"):
         print(f"Processing task: {name} ({task})")
@@ -160,13 +187,13 @@ if __name__ == "__main__":
             subfolder="nf_output/extracted/extracted_mgf",
         )
 
-        # optional cleanup step
+        # optional cleanup step, uncomment the lines below to remove the tar file after extraction
         # os.remove(f"./downloaded_content/{task}.tar")
         # print(f"Removed {task}.tar")
 
-        tsv_file_path = download_tsv_summary(task)
+        tsv_file_path = download_tsv_summary(task, output_dir=output_dir)
 
-        insert_mgf_info(task, name, tsv_file_path)
+        insert_mgf_info(task, name, tsv_file_path, base_folder=output_dir)
 
         os.makedirs("./final_mgf", exist_ok=True)
         concatenate_mgf_files(
