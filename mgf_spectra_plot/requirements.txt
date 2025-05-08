@@ -1,0 +1,5 @@
+matplotlib
+pandas
+requests-cache
+spectrum-utils
+streamlit
