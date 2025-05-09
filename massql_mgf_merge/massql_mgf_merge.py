@@ -65,6 +65,7 @@ def extract_results(tar_file, subfolder):
         print(
             f"Extracted contents of subfolder '{subfolder}' successfully to '{extract_path}'."
         )
+        return extract_path
 
 
 def download_tsv_summary(task, output_dir="./downloaded_content"):
@@ -163,12 +164,35 @@ def renumber_mgf_file(input_mgf, output_mgf):
     print(f"Renumbering complete. Output written to {output_mgf}.")
 
 
+def extract_and_merge_tsv(tar_file: str, subfolder: str, output_file: str):
+    """
+    Extract the contents of a specific subfolder from a tar file and merge TSV files.
+    :param tar_file: Path to the tar file.
+    :param subfolder: Subfolder to extract from the tar file.
+    :param output_file: Output file path for the merged TSV file.
+    """
+    extract_path = extract_results(tar_file, subfolder)
+
+    # Merge TSV files
+    full_path = os.path.join(extract_path, subfolder)
+    tsv_files = [f for f in os.listdir(full_path) if f.endswith('.tsv')]
+    if tsv_files:
+
+        merged_df = pd.concat([pd.read_csv(os.path.join(full_path, f), sep="\t") for f in tsv_files])
+        merged_df.to_csv(output_file, sep="\t", index=False)
+        print(f"Merged TSV files into {output_file}.")
+        return output_file
+    else:
+        print(f"No TSV files found in {extract_path}.")
+        return None
+
+
 if __name__ == "__main__":
     print("Starting GNPS2 task processing...")
 
-    # Example task IDs and names, change this to yor names and task IDs
+    # Example task IDs and names, change this to your names and task IDs
     tasks = {
-        "name_1": "2e50af7f1cfc42r391a5fe2eb7b06de7",
+        "name_1": "2e50af7f1cfc42c391a5fe2eb7b06de7",
         "name_2": "9980bbf19ae54657b2d3d881475745fe",
         "name_3": "1a998a6fa2c2475195f0111039c09515",
     }
@@ -183,21 +207,32 @@ if __name__ == "__main__":
     for name, task in tqdm(tasks.items(), desc="Processing tasks"):
         print(f"Processing task: {name} ({task})")
         extract_results(
-            f"./downloaded_content/{task}.tar",
+            f"{output_dir}/{task}.tar",
             subfolder="nf_output/extracted/extracted_mgf",
         )
 
         # optional cleanup step, uncomment the lines below to remove the tar file after extraction
-        # os.remove(f"./downloaded_content/{task}.tar")
+        # os.remove(f"{output_dir}/{task}.tar")
         # print(f"Removed {task}.tar")
 
-        tsv_file_path = download_tsv_summary(task, output_dir=output_dir)
+        try:
+            tsv_file_path = download_tsv_summary(task, output_dir=output_dir)
+        except requests.exceptions.RequestException as e:
+            print(f"Error downloading TSV summary for task {task}: {e}")
+            print("Trying to extract tsv files for external merge...")
+
+            tsv_file_path = extract_and_merge_tsv(
+                f"{output_dir}/{task}.tar",
+                subfolder="nf_output/extracted/extracted_tsv",
+                output_file=f"{output_dir}/externally_merged_{task}.tsv"
+            )
+
 
         insert_mgf_info(task, name, tsv_file_path, base_folder=output_dir)
 
         os.makedirs("./final_mgf", exist_ok=True)
         concatenate_mgf_files(
-            "./downloaded_content", "./final_mgf/all_concatenated.mgf"
+            output_dir, "./final_mgf/all_concatenated.mgf"
         )
         renumber_mgf_file(
             "./final_mgf/all_concatenated.mgf",
