@@ -3,3 +3,4 @@ pandas
 requests-cache
 spectrum-utils
 streamlit
+pyteomics

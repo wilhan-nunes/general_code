@@ -2,6 +2,7 @@ import requests
 
 from draw import generate_figure
 from spectrum_utils import spectrum as sus
+from pyteomics import mgf
 
 
 def download_spectra_json(usi: str) -> dict | None:
@@ -15,36 +16,25 @@ def download_spectra_json(usi: str) -> dict | None:
         return None
 
 
-def access_scan(mgf_content: str, scan_number: str) -> dict | str:
+def access_scan(mgf_path: str, scan_num: str) -> dict | None:
     """
-    :param mgf_content: MGF file content as a string
-    :param scan_number: Scan number to access
-    :return: Scan content as a string
+    Access a scan number within an MGF file.
+    :param mgf_path: path to the MGF file
+    :param scan_num: Scan number to retrieve
+    :return: a dict containing the spectrum information
     """
-    lines = mgf_content.split('\n')
+    mgf_contents = mgf.IndexedMGF(mgf_path, index_by_scans=True)
+    try:
+        spectrum = mgf_contents.get_spectrum(scan_num)
+        result = dict(zip(spectrum["m/z array"], spectrum["intensity array"]))
+        peaks_string = "\n".join([f"{mz}\t{inten}" for mz, inten in result.items()])
+        precmz = spectrum["params"].get("pepmass")[0]
+        charge = spectrum["params"].get("charge")
+        return {'precmz': precmz, 'charge': charge, 'peaks': peaks_string}
 
-    in_scan = False
-    precmz = None
-    charge = None
-    scan_lines = []
-
-    for line in lines:
-        if line.startswith('CHARGE='):
-            charge = line.split('=')[1].strip()
-        if line.startswith('PEPMASS='):
-            precmz = line.split('=')[1].strip()
-        if line == f'SCANS={scan_number}':
-            in_scan = True
-            scan_lines.append('mz\tintensity')
-        elif in_scan:
-            if line.startswith('END IONS'):
-                break
-            else:
-                scan_lines.append(line)
-    if scan_lines:
-        return {'precmz': precmz, 'charge': charge, 'peaks': '\n'.join(scan_lines)}
-    else:
-        return f"Scan {scan_number} not found in the MGF file."
+    except KeyError:
+        print(f"Scan {scan_num} not found in the MGF file.")
+        return None
 
 
 def parse_usi(usi: str) -> dict:
