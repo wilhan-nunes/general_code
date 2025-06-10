@@ -29,7 +29,7 @@ def access_scan(mgf_path: str, scan_num: str) -> dict | None:
         result = dict(zip(spectrum["m/z array"], spectrum["intensity array"]))
         peaks_string = "\n".join([f"{mz}\t{inten}" for mz, inten in result.items()])
         precmz = spectrum["params"].get("pepmass")[0]
-        charge = spectrum["params"].get("charge")
+        charge = spectrum["params"].get("charge")[0]
         return {'precmz': precmz, 'charge': charge, 'peaks': peaks_string}
 
     except KeyError:
@@ -107,3 +107,8 @@ def calculate_dynamic_kwargs(peaks_string, margin_mz=50, margin_intensity=10, pe
     max_intensity = (max(intensity_values) / max(intensity_values) * 100) + margin_intensity
 
     return mz_min, mz_max, max_intensity
+
+
+if __name__ == '__main__':
+    path = '/Users/wilhan/Downloads/specs_ms_cluster1.mgf'
+    print(access_scan(path, "1"))
